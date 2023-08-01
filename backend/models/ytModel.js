@@ -15,7 +15,7 @@ const downloadVideo = async (url, path, name) => {
             return;
         }
 
-        const videoTitle = info.videoDetails.title.replace(/[/\\?%*:|"<>]/g, ''); // Remove invalid characters from the title
+        const videoTitle = (name) ? name : info.videoDetails.title.replace(/[/\\?%*:|"<>]/g, ''); // Remove invalid characters from the title
         const fileExtension = format.container || 'mp4';
         const outputFileName = `${path}${videoTitle}.${fileExtension}`;
 
@@ -40,6 +40,7 @@ const downloadFile = async (url, path) => {
         const protocol = url.startsWith('https') ? https : http;
         let output = false;
         path = path || `../videos/master/`;
+        console.log('Downloading File:',path);
         const o = protocol.get(url, async (response) => {
             if (response.statusCode !== 200) {
                 console.log({ message: `Failed to download the file. Status Code: ${response.statusCode}`, error: response });
@@ -60,7 +61,6 @@ const downloadFile = async (url, path) => {
                 return output;
             });
 
-
             response.on('data', (chunk) => {
                 downloadedSize += chunk.length;
                 const progress = (downloadedSize / totalSize) * 100;
@@ -74,7 +74,7 @@ const downloadFile = async (url, path) => {
 
             response.on('end', () => {
                 //resolve(data);
-                resolve({message: 'Success', error: null, path : path});
+                resolve({ message: 'Success', error: null, path: path });
             });
 
             response.on('error', (error) => {
@@ -90,6 +90,27 @@ const downloadFile = async (url, path) => {
 
     })
 };
+
+const saveFile = (path, name, content) => {
+    fs.writeFile(path + name, content, (err) => {
+        if (err) {
+            console.error('Terjadi kesalahan:', err);
+        } else {
+            console.log('File berhasil disimpan.');
+        }
+    });
+}
+
+const createDirectory = (path) => {
+
+    fs.mkdir(path, (err) => {
+        if (err) {
+            console.error('Error creating directory:', err);
+        } else {
+            console.log('Directory created successfully.');
+        }
+    });
+}
 
 const infoVideo = async (url) => {
     try {
@@ -109,5 +130,7 @@ const infoVideo = async (url) => {
 module.exports = {
     downloadVideo,
     downloadFile,
+    saveFile,
+    createDirectory,
     infoVideo
 };

@@ -17,6 +17,10 @@
     "http": "^0.0.1-security",
     "https": "^1.0.0",
     "path": "^0.12.7",
+    "puppeteer": "^20.9.0",
+    "puppeteer-core": "^20.9.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-adblocker": "^2.13.6",
     "ytdl-core": "^4.11.5"
   }
 }
