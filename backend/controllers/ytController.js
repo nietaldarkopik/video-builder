@@ -55,7 +55,6 @@ const getFile = async (req, res) => {
   if (Array.isArray(transcripts) && transcripts.length > 0) {
     transcripts.forEach(async (v, i) => {
       //Object.entries(v).forEach(([key,value]) => {
-        console.log(v);
       const baseUrl = v.baseUrl;
       await ytModel.downloadFile(baseUrl, projectDir + 'transcript-' + projectName + '-' + i + '.xml');
       //});

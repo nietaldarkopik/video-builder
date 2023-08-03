@@ -1,7 +1,7 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import Server, { fetchDataPost } from '../configs/Server';
-
+const basePathVideo = '../../videos/master/';
 
 const VideoManager = () => {
   const [fileList, setFileList] = useState([])
@@ -20,7 +20,8 @@ const VideoManager = () => {
   const handleBuilder = (props) => {
     const path = props || false;
     if (path) {
-      return navigate('/video-builder?path=../../videos/master/' + path, { state: props });
+      const fullpath = btoa(basePathVideo + path);
+      return navigate('/video-builder?path=' + fullpath, { state: props });
     } else {
       return false;
     }

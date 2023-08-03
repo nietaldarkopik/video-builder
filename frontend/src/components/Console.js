@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { PostData, fetchDataGet, fetchDataPost } from '../configs/Server';
 import { redirect, useNavigate } from 'react-router-dom'
+const pathVideoMaster = '../videos/master/'
 
 const Table = (props, responsive) => {
     responsive = (!responsive) ? true : responsive;
@@ -63,33 +64,51 @@ const Table = (props, responsive) => {
 
 
 export const FormatVideo = (props) => {
+    const [allData, setAllData] = useState();
     const navigate = useNavigate();
     //console.log('props',props);
-        
+
+    const data = props.data;
+    useEffect(() => {
+        setAllData(data);
+    }, [data])
+
     const handleDownloadFormat = async (configs) => {
         const attributes = configs.target.attributes;
         const properties = {}
         Array.from(attributes).map((v, i) => {
             properties[v.name] = v.value;
         })
+        //properties['alldata'] = allData;
+        properties['path'] = pathVideoMaster;
 
         const params = {
-            body: JSON.stringify(properties)
+            body: JSON.stringify(properties),
         };
 
         const out = await fetchDataPost(params, 'file/download').then((response) => {
             console.log(response);
             return response;
         });
-        const path = out.path;
-        return navigate('/video-builder?path='+path,{state: out});
+
+        const pathVideo = (out && out.path)?out.path:false;
+
+        if(pathVideo)
+        {
+            return navigate('/video-builder?path=' + btoa(pathVideo), { state: out });
+        }
         //return out;
     }
 
-
-    const data = props.data;
     const formatList = (!data.formats) ? [] : data.formats;
     const videoDetails = (!data.videoDetails) ? {} : data.videoDetails;
+    //const videoDetails = (!data.player_response.captions.playerCaptionsTracklistRenderer) ? {} : data.videoDetails;
+    //const player_response = (typeof data.player_response.captions.playerCaptionsTracklistRenderer.captionTracks == "undefined") ? {} : data.player_response.captions.playerCaptionsTracklistRenderer.captionTracks;
+    let player_response = (typeof data.player_response ==  "undefined") ? {} : data.player_response;
+    player_response = (typeof player_response.captions == "undefined") ? {} : player_response.captions;
+    player_response = (typeof player_response.playerCaptionsTracklistRenderer == "undefined") ? {} : player_response.playerCaptionsTracklistRenderer;
+    player_response = (typeof player_response.captionTracks == "undefined") ? {} : player_response.captionTracks;
+
     return (
         <>
             <h1>Format Videos</h1>
@@ -98,7 +117,7 @@ export const FormatVideo = (props) => {
                     const v = val;
                     return (
                         <div className="list-group-item list-group-item-action" aria-current="true">
-                            <button type="button" className="btn w-100 btn-warning" aria-current="true" {...v} videodetails={JSON.stringify(videoDetails)} onClick={(e) => { handleDownloadFormat(e) }}>
+                            <button type="button" className="btn w-100 btn-warning" aria-current="true" format={JSON.stringify(v)} player_response={JSON.stringify(player_response)} videodetails={JSON.stringify(videoDetails)} onClick={(e) => { handleDownloadFormat(e) }}>
                                 Mime : {v.mimeType} - WxH: {v.width} x {v.height} - Quality : {v.quality} - Quality Label : {v.qualityLabel} - Video: {v.hasVideo ? 'true' : 'false'} - Audio : {v.hasAudio ? 'true' : 'false'}
                             </button>
                         </div>

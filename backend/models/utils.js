@@ -10,6 +10,16 @@ exports.listFiles = async (path) => {
     });
 }
 
+exports.readFile = async (path) => {
+
+    try {
+        const data = fs.readFileSync(path);
+        return data;
+    } catch (err) {
+        console.error('Error reading the file:', err);
+    }
+}
+
 exports.decode64 = (str) => {
     let decodedString = str;
     if (/^[A-Za-z0-9+/=]+$/.test(str)) {

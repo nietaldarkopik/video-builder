@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Server, {PostData, fetchDataGet,fetchDataPost,} from "../configs/Server";
 import Console, {FormatVideo} from '../components/Console';
+import Jsontreeview from '../helpers/treeview';
 
 const jquery = require("jquery");
 
@@ -61,7 +62,7 @@ const VideoDownloader = () => {
               <div className="col-md-12">
                 <div className="mb-3">
                   <div className="d-grid gap-2">
-                    <button type="button" name="" id="btn-download-youtube" onClick={handleDownload} className="btn btn-primary">Download</button>
+                    {/* <button type="button" name="" id="btn-download-youtube" onClick={handleDownload} className="btn btn-primary">Download</button> */}
                     <button type="button" name="" id="btn-info-youtube" onClick={handleInfo} className="btn btn-primary">Get Info</button>
                   </div>
                 </div>
@@ -72,7 +73,8 @@ const VideoDownloader = () => {
                     <div>
                       <FormatVideo data={postData.data} />
                       <h1>Data from POST API:</h1>
-                      <Console data={postData.data} />
+                      {/* <Console data={postData.data} /> */}
+                      <Jsontreeview data={postData.data} />
                     </div>
                   ) : (
                     <p>Click the button above to make a POST request.</p>

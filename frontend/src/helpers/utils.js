@@ -1,5 +1,6 @@
+import xml2json from "xml-js";
 
-export const secondsToTime =(seconds) =>  {
+export const secondsToTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const remainingSeconds = Math.floor(seconds % 60);
@@ -9,4 +10,10 @@ export const secondsToTime =(seconds) =>  {
     const formattedSeconds = String(remainingSeconds).padStart(2, '0');
 
     return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+}
+
+export const parseXML = (xmlData) => {
+    let output = xml2json.xml2json(xmlData,{compact: true, spaces: 0});
+
+    return output;
 }

@@ -40,7 +40,7 @@ const downloadFile = async (url, path) => {
         const protocol = url.startsWith('https') ? https : http;
         let output = false;
         path = path || `../videos/master/`;
-        console.log('Downloading File:',path);
+        console.log('Downloading File:', path);
         const o = protocol.get(url, async (response) => {
             if (response.statusCode !== 200) {
                 console.log({ message: `Failed to download the file. Status Code: ${response.statusCode}`, error: response });
@@ -127,10 +127,32 @@ const infoVideo = async (url) => {
     }
 };
 
+const configVideo = async (path) => {
+
+    try {
+        const data = fs.readFileSync(`../videos/master/` + path + `/` + path + `.json`, 'utf8');
+        return data;
+    } catch (err) {
+        console.error('Error reading the file:', err);
+    }
+}
+
+const transcriptVideo = async (path) => {
+
+    try {
+        const data = fs.readFileSync(`../videos/master/` + path + `/transcript-` + path + `-0.xml`, 'utf8');
+        return data;
+    } catch (err) {
+        console.error('Error reading the file:', err);
+    }
+}
+
 module.exports = {
     downloadVideo,
     downloadFile,
     saveFile,
     createDirectory,
+    configVideo,
+    transcriptVideo,
     infoVideo
 };

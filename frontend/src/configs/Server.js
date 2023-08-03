@@ -4,8 +4,8 @@ const Server = {
 let getData = false;
 let postData = false;
 
-export const fetchDataGet = async () => {
-    await fetch(Server.baseUrlServer + 'youtube')
+export const fetchDataGet = async (url) => {
+    return await fetch(Server.baseUrlServer + url)
         .then((response) => response.json())
         .then((data) => { getData = data; })
         .catch((error) => console.error('Error fetching data:', error));
