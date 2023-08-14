@@ -61,8 +61,11 @@ app.post('/youtube/download', ytController.getIndex);
 app.post('/file/download', ytController.getFile);
 app.post('/youtube/info', ytController.getInfo);
 app.post('/file-list', fileController.getIndex);
+app.post('/file-recursive', fileController.getFilesRecursively);
 app.post('/video/info', fileController.getVideoInfo);
 app.post('/video/transcript', fileController.getVideoTranscript);
+app.post('/youtube/search', ytController.searchYtVideo);
+app.post('/video/save-chunks', fileController.buildVideo);
 
 // Jalankan server pada port tertentu
 const port = 4000;

@@ -7,7 +7,7 @@ import { decode64, parseParams } from '../helpers/utils';
 
 const jquery = require("jquery");
 
-const VideoDownloader = () => {
+const FileDownloader = () => {
   const location = useLocation();
   const [getData, setGetData] = useState(null);
   const [postData, setPostData] = useState(null);
@@ -108,4 +108,4 @@ const VideoDownloader = () => {
   );
 };
 
-export default VideoDownloader;
+export default FileDownloader;

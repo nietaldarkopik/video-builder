@@ -1,4 +1,5 @@
 const fs = require('fs');
+const pathFs = require('path');
 
 exports.listFiles = async (path) => {
 
@@ -9,7 +10,22 @@ exports.listFiles = async (path) => {
         return files;
     });
 }
+exports.getFilesRecursively = async (dir, fileList = []) => {
+    const files = fs.readdirSync(dir);
 
+    files.forEach(file => {
+        const filePath = pathFs.join(dir, file);
+        const stat = fs.statSync(filePath);
+
+        if (stat.isDirectory()) {
+            exports.getFilesRecursively(filePath, fileList);
+        } else {
+            fileList.push(filePath);
+        }
+    });
+
+    return fileList;
+}
 exports.readFile = async (path) => {
 
     try {
@@ -22,8 +38,8 @@ exports.readFile = async (path) => {
 
 exports.decode64 = (str) => {
     let decodedString = str;
-    if (/^[A-Za-z0-9+/=]+$/.test(str)) {
-        decodedString = atob(str);
+    if (str != '' && str != false && str != 'false' && /^[A-Za-z0-9+/=]+$/.test(str)) {
+        decodedString = (!atob(str)) ? str : atob(str);
     }
     console.log(decodedString);
     return decodedString;
@@ -31,5 +47,11 @@ exports.decode64 = (str) => {
 
 exports.generateUniqueTimestamp = (tostring = true) => {
     const timestamp = Date.now();
-    return (tostring)?timestamp.toString():timestamp;
+    return (tostring) ? timestamp.toString() : timestamp;
+}
+
+exports.wait = (seconds) => {
+    return new Promise((resolve) => {
+        setTimeout(resolve, seconds * 1000);
+    });
 }

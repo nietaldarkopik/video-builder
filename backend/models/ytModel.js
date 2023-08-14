@@ -2,6 +2,8 @@ const ytdl = require('ytdl-core');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
+const yts = require('yt-search')
+const splitter = require('./splitter')
 
 const downloadVideo = async (url, path, name) => {
     try {
@@ -130,8 +132,12 @@ const infoVideo = async (url) => {
 const configVideo = async (path) => {
 
     try {
-        const data = fs.readFileSync(`../videos/master/` + path + `/` + path + `.json`, 'utf8');
-        return data;
+        if (!path) {
+            return false
+        } else {
+            const data = fs.readFileSync(`../videos/master/` + path + `/` + path + `.json`, 'utf8');
+            return data;
+        }
     } catch (err) {
         console.error('Error reading the file:', err);
     }
@@ -140,10 +146,48 @@ const configVideo = async (path) => {
 const transcriptVideo = async (path) => {
 
     try {
-        const data = fs.readFileSync(`../videos/master/` + path + `/transcript-` + path + `-0.xml`, 'utf8');
-        return data;
+        if (!path) {
+            return ''
+        } else {
+            const data = fs.readFileSync(`../videos/master/` + path + `/transcript-` + path + `-0.xml`, 'utf8');
+            return data;
+        }
     } catch (err) {
         console.error('Error reading the file:', err);
+    }
+}
+
+// Fungsi untuk mencari video berdasarkan judul
+const searchYouTube = async (query) => {
+    try {
+        const options = {
+            pageStart: 1,
+            pageEnd: 1,
+            pages: 1,
+            search: query
+            //userAgent: 5,
+            //hl: 5,
+            //gl: 5,
+            //category: 5,
+            //sp: 5,
+        };
+        console.log(options);
+        const searchResults = await yts(options);
+        return searchResults;
+    } catch (error) {
+        console.error('Error searching YouTube:', error.message);
+        return [];
+    }
+}
+
+// Fungsi untuk mencari video berdasarkan judul
+const buildVideo = async (query) => {
+    try {
+        const searchResults = await splitter.buildVideo(query);
+        return searchResults;
+    } catch (error) {
+        console.error('Error searching YouTube:', error.message);
+        return [];
     }
 }
 
@@ -152,6 +196,8 @@ module.exports = {
     downloadFile,
     saveFile,
     createDirectory,
+    searchYouTube,
+    buildVideo,
     configVideo,
     transcriptVideo,
     infoVideo

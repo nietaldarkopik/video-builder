@@ -77,9 +77,18 @@ const getFile = async (req, res) => {
   //res.render('youtube', { data }); // Menampilkan data menggunakan view
 };
 
+const searchYtVideo = async (req, res) => {
+  const query = req.body.query;
+  const video = await ytModel.searchYouTube(query)
+
+  res.json({data: video});
+  //res.render('youtube', { data }); // Menampilkan data menggunakan view
+};
+
 module.exports = {
   getIndex,
   getFile,
+  searchYtVideo,
   getPlay,
   getInfo
 }

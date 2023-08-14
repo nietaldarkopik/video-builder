@@ -21,6 +21,16 @@ export const fetchDataPost = async (dataPost, url) => {
     console.log('requestOptions', requestOptions);
     const out = await fetch(Server.baseUrlServer + url, requestOptions)
         .then((response) => {
+            if (response.status === 302) {
+                const redirectUrl = response.headers.get('Location');
+                if (redirectUrl) {
+                    return fetch(redirectUrl);
+                } else {
+                    throw new Error('Redirect location not found.');
+                }
+            } else if (!response.ok) {
+                throw new Error(`Failed to download the file. Status Code: ${response.status}`);
+            }
             const responsejson = response.json();
             return responsejson;
         })

@@ -4,23 +4,47 @@ import Server, { fetchDataPost } from '../configs/Server';
 const basePathVideo = '../../videos/master/';
 
 const VideoManager = () => {
-  const [fileList, setFileList] = useState([])
+  const [fileList, setFileList] = useState(false)
   const navigate = useNavigate();
 
-  const getFileList = async () => {
-    const files = await fetchDataPost({ body: JSON.stringify({ path: '../videos/master/' }) }, 'file-list');
-    const data = files.data || [];
-    setFileList(data);
+  const getFileList = async (p = '../videos/master/') => {
+    const vext = ['mp4', 'webm'];
+    //const files = await fetchDataPost({ body: JSON.stringify({ path: p }) }, 'file-list');
+    const files = await fetchDataPost({ body: JSON.stringify({ path: p }) }, 'file-recursive');
+    let data = files.data || [];
+    let output = [];
+
+    console.log(data);
+    if(Array.isArray(data) && data.length > 0)
+    {
+      output = data.filter((v,i) => {
+        let check = v.split('/');
+        check = check[check.length - 1];
+        let cext = check.split('.');
+        cext = cext[cext.length - 1];
+        console.log(cext);
+        if (vext.indexOf(cext) !== -1) {
+          return true
+        } else {
+          return false;
+        }
+      })
+    }
+    setFileList(output);
   }
 
-  useState(() => {
-    getFileList();
+  useEffect(() => {
+    if(fileList === false)
+    {
+      getFileList();
+    }
   })
 
   const handleBuilder = (props) => {
     const path = props || false;
     if (path) {
-      const fullpath = btoa(basePathVideo + path);
+      //const fullpath = btoa(basePathVideo + path);
+      const fullpath = btoa(path);
       return navigate('/video-builder?path=' + fullpath, { state: props });
     } else {
       return false;
@@ -41,7 +65,7 @@ const VideoManager = () => {
               <button type="button" className="btn btn-sm btn-outline-danger">Delete</button>
               <button type="button" className="btn btn-sm btn-outline-primary">Detail</button>
               <button type="button" className="btn btn-sm btn-outline-primary">Video</button>
-              <button type="button" className="btn btn-sm btn-outline-primary" onClick={(e) => {return handleBuilder(file)}}>Builder</button>
+              <button type="button" className="btn btn-sm btn-outline-primary" onClick={(e) => { return handleBuilder(file) }}>Builder</button>
             </div>
           </td>
         </tr>
@@ -80,7 +104,7 @@ const VideoManager = () => {
                       </tr>
                     </thead>
                     <tbody className="table-group-divider">
-                      {fileList.map((v, i) => {
+                      {fileList !== false && fileList.map((v, i) => {
                         return (<TrVideo file={v} key={i} no={i + 1} />)
                       })
                       }

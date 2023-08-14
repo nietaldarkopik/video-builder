@@ -13,7 +13,34 @@ export const secondsToTime = (seconds) => {
 }
 
 export const parseXML = (xmlData) => {
-    let output = xml2json.xml2json(xmlData,{compact: true, spaces: 0});
+    let output = xml2json.xml2json(xmlData, { compact: true, spaces: 0 });
 
     return output;
+}
+
+
+export const parseParams = (params = "") => {
+    const rawParams = params.replace("?", "").split("&");
+    const extractedParams = {};
+    rawParams.forEach((item) => {
+        item = item.split("=");
+        extractedParams[item[0]] = item[1];
+    });
+    return extractedParams;
+};
+
+export const decode64 = (str) => {
+    let decodedString = str;
+    if (str && /^[A-Za-z0-9+/=]+$/.test(str)) {
+        decodedString = (!atob(str)) ? str : atob(str);
+    }
+    return decodedString;
+}
+
+export const encode64 = (str) => {
+    let decodedString = str;
+    if (/^[A-Za-z0-9+/=]+$/.test(str)) { } else {
+        decodedString = btoa(str);
+    }
+    return decodedString;
 }
