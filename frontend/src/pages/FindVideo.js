@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Server, { PostData, fetchDataPost } from '../configs/Server';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBuildingCircleXmark, faDownload } from '@fortawesome/free-solid-svg-icons';
@@ -13,7 +13,7 @@ const FindVideo = () => {
   const [infoVideo, setInfoVideo] = useState(false);
   const refInputSearch = useRef()
 
-  const handleInfo = async (urlVideo,videoId) => {
+  const handleInfo = async (urlVideo, videoId) => {
     const params = {
       body: JSON.stringify({ url: urlVideo })
     };
@@ -24,16 +24,43 @@ const FindVideo = () => {
     const dataInfo_data = dataInfo?.data || false
     let oinfo = [];
 
-    if(Array.isArray(infoVideo))
-    {
+    if (Array.isArray(infoVideo)) {
       oinfo = infoVideo;
       oinfo[videoId] = dataInfo_data
-    }else{
+    } else {
       oinfo[videoId] = dataInfo_data
     }
-    setInfoVideo(oinfo)
+    setInfoVideo(curr => ({
+      items: oinfo
+    }))
     return dataInfo_data
   }
+
+  useEffect(() => {
+    try {/* 
+      const fetchInfo = async () => {
+        const infoListVideo = listVideos.map(async (v, i) => {
+          const params = {
+            body: JSON.stringify({ url: v.url })
+          };
+          const dataInfo = await fetchDataPost(params, 'youtube/info');
+          const dataInfo_data = dataInfo?.data || false
+          return dataInfo_data;
+        })
+
+        const resolvedData = await Promise.all(infoListVideo);
+
+        setInfoVideo(resolvedData)
+      }
+      console.log(infoVideo.length,infoVideo)
+      console.log(listVideos.length,listVideos)
+      if (listVideos.length > 0 && (typeof infoVideo == 'undefined')) {
+        fetchInfo()
+      } */
+    } catch (error) {
+
+    }
+  }, [listVideos, infoVideo])
 
   const doSearch = async (page) => {
     const limit = 4; // Number of results per page
@@ -43,9 +70,23 @@ const FindVideo = () => {
     const v = await fetchDataPost({ body: JSON.stringify(query) }, 'youtube/search')
     let dtvideos = v?.data?.videos
     dtvideos = dtvideos.slice(startIndex, startIndex + limit);
-  
-    setInfoVideo(false)
+
+
+    const infoListVideo = dtvideos.map(async (v, i) => {
+      const params = {
+        body: JSON.stringify({ url: v.url })
+      };
+      const dataInfo = await fetchDataPost(params, 'youtube/info');
+      const dataInfo_data = dataInfo?.data || false
+      return dataInfo_data;
+    })
+
+    const resolvedData = await Promise.all(infoListVideo);
+
+    //setInfoVideo(false)
     setListVideos(dtvideos);
+    setInfoVideo(resolvedData)
+
     return dtvideos
   }
 
@@ -60,20 +101,20 @@ const FindVideo = () => {
     const url = props.url || ''
     const videoid = props.videoid || ''
     let formats = [];
-    if(typeof infoVideo[videoid] == 'undefined'){
-      handleInfo(url,videoid);
+    if (typeof infoVideo[videoid] == 'undefined') {
+      //handleInfo(url, videoid);
       formats = infoVideo[videoid]?.formats;
-    }else{
+    } else {
       formats = infoVideo[videoid]?.formats;
     }
     console.log('infoVideo', infoVideo[videoid]?.formats);
     return (
       <>
-        {formats && 
+        {formats &&
           Object.values(formats).map((v) => {
             return (
               <option value={v.url}>
-                {v.container} {v.quality} {v.qualityLabel} Audio: {v.hasAudio ? '1':'0'} Video: {v.hasVideo ? '1':'0'}
+                {v.container} {v.quality} {v.qualityLabel} Audio: {v.hasAudio ? '1' : '0'} Video: {v.hasVideo ? '1' : '0'}
               </option>
             )
           })
@@ -82,25 +123,31 @@ const FindVideo = () => {
     )
   }
 
-  const ListVideo =  (props) => {
+  const ListVideo = (props) => {
     const videoId = props.videoId || ''
     const title = props.title || ''
     const ago = props.ago || ''
     const views = props.views || ''
     const description = props.description || ''
     const url = props.url || ''
+    const index = props.index
 
     const author_url = props?.author?.url || ''
     const author_name = props?.author?.name || ''
     const duration_seconds = props?.duration?.seconds || ''
     const duration_timestamp = props?.duration?.timestamp || ''
+    const infoVideo_index = infoVideo[index] || false
+    const infoVideo_format = infoVideo_index?.formats
+    console.log('infoVideo_format',index, infoVideo_format)
 
     return (
-      <div className="col">
-        <div className="card">
-          {/* <img src={props.thumbnail} className="card-img-top" alt="..." /> */}
+      <div className="col col-md-6">
+        <div className="card h-100">
           <div className="ratio ratio-16x9">
-            <iframe width="560" height="315" src={'https://www.youtube.com/embed/' + videoId} frameborder="0" allowfullscreen></iframe>
+            <img src={props.thumbnail} className="card-img-top" alt="..." />
+          </div>
+          <div className="ratiox ratio-16x9x">
+            {/* <iframe width="560" height="315" src={'https://www.youtube.com/embed/' + videoId} frameborder="0" allowfullscreen></iframe> */}
           </div>
           <div className="card-body">
             <div className="row justify-content-start align-items-start gx-2">
@@ -113,6 +160,8 @@ const FindVideo = () => {
                 <span className="badge me-2 fs-6 bg-warning text-dark"><strong>View</strong>: {views} Views</span>
                 <p className="card-text">{description}</p>
               </div>
+            </div>
+          <div className="card-footer">
               <div className="col-md-12">
                 <a target='_blank' className='btn btn-primary w-100 my-3' href={`./video-downloader?path=` + encode64(url)}>
                   <FontAwesomeIcon icon={faBuildingCircleXmark}></FontAwesomeIcon> Force Download
@@ -121,7 +170,16 @@ const FindVideo = () => {
                 <div className="input-group mb-3">
                   <select className="form-select" id="input-force-download" aria-label="Force Download">
                     <option selected>Choose...</option>
-                    <OptionVideo url={url} videoid={videoId}/>
+                    {/* <OptionVideo url={url} videoid={videoId} /> */}
+                    {infoVideo_format &&
+                      infoVideo_format.map((v) => {
+                        return (
+                          <option value={v.url}>
+                            {v.container} {v.quality} {v.qualityLabel} Audio: {v.hasAudio ? '1' : '0'} Video: {v.hasVideo ? '1' : '0'}
+                          </option>
+                        )
+                      })
+                    }
                   </select>
                   <button className="btn btn-primary" type="button">
                     <FontAwesomeIcon icon={faDownload}></FontAwesomeIcon> Select Download
@@ -135,7 +193,7 @@ const FindVideo = () => {
     )
   }
 
-  const isLoadingHtml = (isLoading !== false)?<div className="row row-cols-1 row-cols-md-2 g-4"><div classname="col">Loading ...</div></div>:<></>;
+  const isLoadingHtml = (isLoading !== false) ? <div className="row row-cols-1 row-cols-md-2 g-4"><div classname="col">Loading ...</div></div> : <></>;
   return (
     <>
       <div className="container-fluid my-5">
@@ -159,10 +217,10 @@ const FindVideo = () => {
       </div>
       <div className="container-fluid">
         {isLoadingHtml}
-        <div className="row row-cols-1 row-cols-md-2 g-4">
+        <div className="row justify-content-center">
           {listVideos &&
             listVideos.map((v, i) => {
-              return (<ListVideo {...v} key={i} />)
+              return (<ListVideo {...v} key={i} index={i} />)
             })
           }
         </div>

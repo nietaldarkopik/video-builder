@@ -2,6 +2,8 @@
 const utils = require('../models/utils');
 const ytModel = require('../models/ytModel');
 const splitter = require('../models/splitter');
+const fs = require('fs');
+const pathFs = require('path');
 
 exports.getIndex = async (req, res) => {
     const path = req.body.path || false;
@@ -22,6 +24,14 @@ exports.getFile = async (req, res) => {
     let output = {};
     const data = await utils.readFile(path);
     res.send(data);
+};
+
+
+exports.streamFile = async (req, res) => {
+    const path = req.query.path || false;
+    const data = await pathFs.join(__dirname, '../', utils.front_decode64(path));
+    console.log(data)
+    res.sendFile(data);
 };
 
 exports.getVideoInfo = async (req, res) => {

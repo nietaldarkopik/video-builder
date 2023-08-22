@@ -54,7 +54,8 @@ app.get('/', mainController.getIndex);
 app.get('/youtube/download', ytController.getIndex);
 app.get('/youtube/info', ytController.getIndex);
 app.get('/play-video', ytController.getPlay);
-app.get('/file/read', fileController.getFile);
+app.get('/play-audio', ytController.getPlay);
+app.get('/file/read', fileController.streamFile);
 //app.get('/youtube/build-video', ytController.getBuilder);
 
 app.post('/youtube/download', ytController.getIndex);

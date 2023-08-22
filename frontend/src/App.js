@@ -11,6 +11,7 @@ import VideoBuilder from './pages/VideoBuilder';
 import FindVideo from './pages/FindVideo';
 import VideoDownloader from './pages/VideoDownloader';
 import ContentBuilder from './pages/ContentBuilder';
+import SoundEditor from './pages/SoundEditor';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="video-builder" element={<VideoBuilder/>} />
           <Route path="find-video" element={<FindVideo/>} />
           <Route path="content-builder" element={<ContentBuilder/>} />
+          <Route path="sound-editor" element={<SoundEditor/>} />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>

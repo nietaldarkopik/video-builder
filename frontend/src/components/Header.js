@@ -35,6 +35,9 @@ const Header = () => {
                             <li className="nav-item">
                                 <a className="nav-link" href="/content-builder">Content Creator</a>
                             </li>
+                            <li className="nav-item">
+                                <a className="nav-link" href="/sound-editor">Sound Editor</a>
+                            </li>
                         </ul>
                     </div>
                 </div>
